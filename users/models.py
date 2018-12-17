@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumField
 
 from users.enums import Measurement
+from users.managers import UserManager
 
 
 class FitUser(AbstractUser):
@@ -12,6 +13,8 @@ class FitUser(AbstractUser):
     last_modified_date = models.DateTimeField(auto_now=True)
     email = models.EmailField(_('email address'), max_length=200,
                               help_text='required', null=False)
+
+    objects = UserManager()
 
     def __str__(self):
         return self.username
