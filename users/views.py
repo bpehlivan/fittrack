@@ -50,4 +50,5 @@ class UserViewSet(ModelViewSet):
 
 """
 TODO: Make activation view
+https://stackoverflow.com/questions/50298114/django-2-how-to-register-a-user-using-email-confirmation-and-cbvs
 """
