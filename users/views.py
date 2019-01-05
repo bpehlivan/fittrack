@@ -55,7 +55,10 @@ class UserRegisterViewSet(ModelViewSet):
         return Response(resp_message, status=status.HTTP_201_CREATED)
 
 
-class PasswordReset(ViewSet):
+class PasswordResetViewSet(ViewSet):
+    renderer_classes = [JSONRenderer]
+    http_method_names = ["post"]
+
     def create(self, request):
         serializer = PasswordResetSerializer(data=request.data)
         if serializer.is_valid():
