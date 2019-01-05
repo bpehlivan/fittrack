@@ -1,18 +1,21 @@
 from django.contrib.sites.shortcuts import get_current_site
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_text
 from django.core.mail import EmailMessage
+from django.contrib.auth import get_user_model, login
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework import status
 
 from users.serializers import FitUserSerializer
-from users.models import FitUser
 from users.tokens import account_activation_token
 
+FitUser = get_user_model()
 
-class UserViewSet(ModelViewSet):
+
+class UserRegisterViewSet(ModelViewSet):
     serializer_class = FitUserSerializer
     queryset = FitUser.objects.all()
     renderer_classes = [JSONRenderer]
@@ -24,7 +27,10 @@ class UserViewSet(ModelViewSet):
         validated_data = serialized_data.validated_data
         if FitUser.objects.does_user_exists(validated_data["username"]):
             return Response(
-                {"error": "A user with given username already exists"},
+                {
+                    "status": "error",
+                    "message": "A user with given username already exists",
+                },
                 status=status.HTTP_409_CONFLICT)
         user_password = validated_data.pop("password")
         user = FitUser(**validated_data)
@@ -42,10 +48,32 @@ class UserViewSet(ModelViewSet):
 
         email = EmailMessage(mail_subject, message, to=[to_email])
         email.send()
-        resp_message = "Please check your email address" \
-                       " to complete the registration."
-        return Response({
-            "created": resp_message}, status=status.HTTP_201_CREATED)
+        resp_message = {
+            "status": "created",
+            "message": "Please check your email address to complete registering"
+        }
+        return Response(resp_message, status=status.HTTP_201_CREATED)
+
+
+class Activation(APIView):
+    def get(self, request, uidb64, token):
+        try:
+            user_id = force_text(urlsafe_base64_decode(uidb64))
+            user = FitUser.objects.get(pk=user_id)
+        except(TypeError, ValueError, OverflowError, FitUser.DoesNotExist):
+            user = None
+
+        if user is not None and account_activation_token.check_token(user,
+                                                                     token):
+            user.is_active = True
+            user.save()
+            login(request, user)
+
+        resp_message = {
+            "status": "activated",
+            "message": "Your account is activated"
+        }
+        return Response(resp_message, status=status.HTTP_200_OK)
 
 
 """
