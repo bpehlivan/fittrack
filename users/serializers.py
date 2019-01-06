@@ -1,14 +1,19 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 
-from users.models import FitUser
 
+class UserCreationSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
-class FitUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = FitUser
+        model = User
         fields = ("username", "first_name", "last_name", "email", "password")
+        write_only_fields = ("password",)
 
 
-class PasswordResetSerializer(serializers.Serializer):
-    e_mail = serializers.EmailField()
-
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("username", "first_name", "last_name", "email", "pk")

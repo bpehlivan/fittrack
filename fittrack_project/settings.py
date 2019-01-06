@@ -90,9 +90,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# User model for authantication
-AUTH_USER_MODEL = 'users.FitUser'
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
