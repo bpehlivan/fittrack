@@ -20,7 +20,7 @@ class UserViewSet(ModelViewSet):
         User.objects.create_user(**validated_data)
 
     def perform_update(self, serializer):
-        instance = serializer.save()
+        serializer.save()
 
     def perform_destroy(self, instance):
         instance.is_active = False
