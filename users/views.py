@@ -1,11 +1,13 @@
 from django.contrib.auth.models import User
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework.renderers import JSONRenderer, HTMLFormRenderer
 
 from users.serializers import UserSerializer, UserCreationSerializer
 
 
-class UserViewSet(ModelViewSet):
+class UserViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin,
+                  mixins.RetrieveModelMixin, mixins.DestroyModelMixin,
+                  GenericViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     renderer_classes = [JSONRenderer, HTMLFormRenderer]
