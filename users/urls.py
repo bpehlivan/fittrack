@@ -1,15 +1,9 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
-from rest_framework.routers import SimpleRouter
 
-from users.views import UserViewSet
-
-router = SimpleRouter()
-
-router.register(r'users', UserViewSet, 'users')
+from users.views import AccoutView
 
 urlpatterns = [
-    path('login/', obtain_auth_token, name='token')
+    path('login/', obtain_auth_token, name='token'),
+    path('account/', AccoutView.as_view(), name='account')
 ]
-
-urlpatterns += router.urls

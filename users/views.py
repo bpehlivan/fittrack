@@ -1,29 +1,40 @@
 from django.contrib.auth.models import User
-from rest_framework.viewsets import mixins, GenericViewSet
-from rest_framework.renderers import JSONRenderer, HTMLFormRenderer
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
 
 from users.serializers import UserSerializer, UserCreationSerializer
 
 
-class UserViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin,
-                  mixins.RetrieveModelMixin, mixins.DestroyModelMixin,
-                  GenericViewSet):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    renderer_classes = [JSONRenderer, HTMLFormRenderer]
+class AccoutView(APIView):
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
-    def get_serializer_class(self):
-        if self.action == "create":
-            return UserCreationSerializer
-        return UserSerializer
-
-    def perform_create(self, serializer):
+    def post(self, request, format=None):
+        serializer = UserCreationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
-        User.objects.create_user(**validated_data)
+        user = User.objects.create_user(**validated_data)
+        serializer = UserSerializer(instance=user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def perform_update(self, serializer):
+    def get(self, request, format=None):
+        serializer = UserSerializer(instance=request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, format=None):
+        serializer = UserSerializer(request.user, data=request.data,
+                                    partial=True)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def perform_destroy(self, instance):
-        instance.is_active = False
-        instance.save()
+    def delete(self, request, format=None):
+        user = request.user
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
