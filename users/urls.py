@@ -6,7 +6,7 @@ from users.views import UserViewSet
 
 router = SimpleRouter()
 
-router.register(r'users', UserViewSet)
+router.register(r'users', UserViewSet, 'users')
 
 urlpatterns = [
     path('login/', obtain_auth_token, name='token')
