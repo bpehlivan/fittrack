@@ -6,3 +6,6 @@ djangorestframework==3.9.0
 Markdown==3.0.1
 psycopg2==2.7.6.1
 pytz==2018.7
+psycopg2==2.7.6.1
+psycopg2-binary==2.7.6.1
+model-mommy==1.6.0
