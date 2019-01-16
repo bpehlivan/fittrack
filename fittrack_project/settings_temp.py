@@ -1,11 +1,13 @@
+import os
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fittrack',
-        'USER': 'postgres',
+        'NAME': os.environ.get('DATABASE_NAME', 'fittrack'),
+        'USER': os.environ.get('DATABASE_USER', 'postgres'),
         'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '5432'
+        'HOST': os.environ.get('DATABASE_HOST', '127.0.0.1'),
+        'PORT': os.environ.get('DATABASE_PORT', '5432'),
     }
 }
 

@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+    db:
+        image: postgres:alpine
+        volumes:
+            - postgres_fittrack:/tmp/pgdata
+        ports:
+            - "5432:5432"
+    fittrack:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        depends_on:
+            - db
+        env_file:
+            - ./container.env
+        command: bash -c "python manage.py runserver 0.0.0.0:8000"
+        volumes:
+            - .:/usr/src/fittrack
+        ports:
+            - "8000:8000"
+        links:
+            - db
+    pgadmin:
+        image: fenglc/pgadmin4
+        ports:
+            - "5050:5050"
+        volumes:
+            - pgadmin:/root/.pgadmin
+        links:
+            - db
+volumes:
+    postgres_fittrack:
+    pgadmin:
+
