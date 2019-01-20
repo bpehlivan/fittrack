@@ -13,9 +13,15 @@ services:
             dockerfile: Dockerfile
         depends_on:
             - db
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://db:5432"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+        restart: on-failure:3
         env_file:
             - ./container.env
-        command: bash -c "python manage.py runserver 0.0.0.0:8000"
+        command: ["./entrypoint.sh", "python", "./manage.py", "runserver", "0.0.0.0:8000"]
         volumes:
             - .:/usr/src/fittrack
         ports:
