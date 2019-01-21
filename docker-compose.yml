@@ -13,6 +13,7 @@ services:
             dockerfile: Dockerfile
         depends_on:
             - db
+            - caching
         healthcheck:
             test: ["CMD", "curl", "-f", "http://db:5432"]
             interval: 30s
@@ -28,6 +29,7 @@ services:
             - "8000:8000"
         links:
             - db
+            - caching
     pgadmin:
         image: fenglc/pgadmin4
         ports:
@@ -36,6 +38,10 @@ services:
             - pgadmin:/root/.pgadmin
         links:
             - db
+    caching:
+        image: redis:5-alpine
+        ports:
+            - "6379:6379"
 volumes:
     postgres_fittrack:
     pgadmin:
